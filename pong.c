@@ -1,39 +1,39 @@
 #include <stdio.h>
 
-// Переменные для хранения счета игроков
-// Variables for storing players scores
-int player_one_score = 0; 
-int player_two_score = 0; 
-
 // Объявление функций
-// Function declaration
-void play_game(); 
+// Declaring functions
+void play_game(int *player_one_score, int *player_two_score);
 int handle_player_one_input(char input, int paddle_one_top, int paddle_one_bottom,
                             int min_y, int max_y);
 int handle_player_two_input(char input, int paddle_two_top, int paddle_two_bottom,
                             int min_y, int max_y);
 
 int main(void) {
-    // Основной игровой цикл
-    // Main game loop
-    while (player_one_score < 21 && player_two_score < 21) {
-        play_game(); // Запускаем игру / Launch the game
-    }
+    // Ханение счета игроков
+    // Storing player accounts
+    int player_one_score = 0;
+    int player_two_score = 0;
 
+    // Основной игровой цикл
+    // Main game cycle
+    while (player_one_score < 21 && player_two_score < 21) {
+        play_game(&player_one_score, &player_two_score);
+    }
+    
     // Поздравление победителя
     // Congratulations to the winner
     if (player_one_score == 21) {
-        printf("Congratulations! Player One has won with a score of: %d - %d\n", 
+        printf("Congratulations! Player One has won with a score of: %d - %d\n",
                player_one_score, player_two_score);
     } else if (player_two_score == 21) {
-        printf("Congratulations! Player Two has won with a score of: %d - %d\n", 
+        printf("Congratulations! Player Two has won with a score of: %d - %d\n",
                player_two_score, player_one_score);
     }
 
-    return 0; 
+    return 0;
 }
 
-void play_game() {
+void play_game(int *player_one_score, int *player_two_score) {
     // Позиции ракеток
     // Racket positions
     int paddle_one_top = 5;
@@ -48,7 +48,7 @@ void play_game() {
     char vertical_border = '|';
     char horizontal_border = '-';
     char empty_space = ' ';
-    char ball_symbol = '*'; 
+    char ball_symbol = '*';
 
     // Позиции мяча
     // Ball positions
@@ -64,11 +64,11 @@ void play_game() {
     int min_y = 1;
 
     printf("\033[0d\033[2J"); // Очистка экрана / Clearing the screen
-    while (1) { 
+    while (1) {
         printf("\033[0d\033[2J"); // Очистка экрана / Clearing the screen
 
         // Отображение игрового поля
-        // Display the playing field
+        // Display of the playing field
         for (int y = 0; y < max_y; y++) {
             for (int x = 0; x < max_x; x++) {
                 if (x == 0 || x == max_x - 1) {
@@ -76,62 +76,64 @@ void play_game() {
                 } else if (y == 0 || y == max_y - 1) {
                     printf("%c", horizontal_border);
                 } else if (y == ball_y && x == ball_x) {
-                    printf("%c", ball_symbol); 
+                    printf("%c", ball_symbol);
                 } else if ((y >= paddle_one_top && y <= paddle_one_bottom &&
                             x == paddle_one_x) ||
                            (y >= paddle_two_top && y <= paddle_two_bottom &&
                             x == paddle_two_x)) {
-                    printf("%c", vertical_border); 
+                    printf("%c", vertical_border);
                 } else {
-                    printf("%c", empty_space); 
+                    printf("%c", empty_space);
                 }
             }
-            printf("\n"); 
+            printf("\n");
         }
 
-        // Изменение направления мяча при достижении границ
-        // Change the direction of the ball when reaching the boundaries
+        // Изменение направления мяча
+        // Changing the direction of the ball
         if (ball_y == 23)
-            ball_speed_y = -1; 
+            ball_speed_y = -1;
         if (ball_y == 1)
-            ball_speed_y = 1; 
+            ball_speed_y = 1;
 
         // Проверка на победу первого игрока
-        // Check for first player win
+        // Check for the victory of the first player
         if (ball_x == 79) {
-            player_one_score++;
+            (*player_one_score)++;
             printf("Point for Player One! Current score: %d - %d\n",
-                   player_one_score, player_two_score);
-            break; // Завершение раунда / End of round
+                   *player_one_score, *player_two_score);
+            break; // Завершение раунда / End of the round
         }
+        
         // Проверка на победу второго игрока
         // Check for the victory of the second player
         if (ball_x == 0) {
-            player_two_score++;
+            (*player_two_score)++;
             printf("Point for Player Two! Current score: %d - %d\n",
-                   player_one_score, player_two_score);
-            break; // Завершение раунда / End of round
+                   *player_one_score, *player_two_score);
+            break; // Завершение раунда / End of the round
         }
 
-        // Проверка столкновений мяча с ракетками
-        // Check for ball collisions with paddles
+        // Проверка мяча с ракетками
+        // Checking the ball with rackets
         if ((paddle_two_top <= ball_y && ball_y <= paddle_two_bottom &&
              ball_x == paddle_two_x - 1))
-            ball_speed_x = -1; 
+            ball_speed_x = -1;
         if (paddle_one_top <= ball_y && ball_y <= paddle_one_bottom &&
             ball_x == paddle_one_x + 1)
-            ball_speed_x = 1; 
+            ball_speed_x = 1;
 
-        // Отображение текущего счета
-        // Display the current account
-        printf("Player One's score: %d\n", player_one_score);
-        printf("Player Two's score: %d\n", player_two_score);
+        // Текущий счет
+        // Current account
+        printf("Player One's score: %d\n", *player_one_score);
+        printf("Player Two's score: %d\n", *player_two_score);
+        
+        // Ввод пользователя
+        // User Input
+        char input = getchar();
 
-       // Получение ввода от пользователя
-       // Get input from the user
-        char input = getchar(); 
-        // Обработка ввода для первой ракетки
-        // Handle input for the first paddle
+        // Ввод для первой ракетки
+        // Input for the first racket
         if (handle_player_one_input(input, paddle_one_top, paddle_one_bottom,
                                     min_y, max_y) == 1) {
             paddle_one_top++;
@@ -141,8 +143,9 @@ void play_game() {
             paddle_one_top--;
             paddle_one_bottom--;
         }
-        // Обработка ввода для второй ракетки
-        // Handle input for the second paddle
+
+        // Ввод для второй ракетки
+        // Input for the second racket
         if (handle_player_two_input(input, paddle_two_top, paddle_two_bottom,
                                     min_y, max_y) == 1) {
             paddle_two_top++;
@@ -152,7 +155,7 @@ void play_game() {
             paddle_two_top--;
             paddle_two_bottom--;
         }
-
+        
         // Движение мяча
         // Ball movement
         if (input == '\n') {
@@ -162,8 +165,8 @@ void play_game() {
     }
 }
 
-// Функция обработки ввода для первой ракетки
-// Input processing function for the first paddle
+//Ввод для первой ракетки
+//Input for the first racket
 int handle_player_one_input(char input, int paddle_one_top, int paddle_one_bottom,
                             int min_y, int max_y) {
     if ((input == 'a' || input == 'A') && paddle_one_top != min_y)
@@ -173,8 +176,8 @@ int handle_player_one_input(char input, int paddle_one_top, int paddle_one_botto
     return 0;
 }
 
-// Функция обработки ввода для второй ракетки
-// Input processing function for the second racket
+//Ввод для второй ракетки
+//Input for the second racket
 int handle_player_two_input(char input, int paddle_two_top, int paddle_two_bottom,
                             int min_y, int max_y) {
     if ((input == 'k' || input == 'K') && paddle_two_top != min_y)
